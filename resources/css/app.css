@@ -1,0 +1,21 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans: 'Montserrat', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Invenio Color Palette */
+    --color-inv-forest:    #4E5340;
+    --color-inv-moss:      #697268;
+    --color-inv-slate:     #95A3A4;
+    --color-inv-sky:       #B7D1DA;
+    --color-inv-mist:      #E2E8DD;
+    --color-inv-midnight:  #08090A;
+    --color-inv-stone:     #A7A2A9;
+    --color-inv-snow:      #F4F7F5;
+    --color-inv-iron:      #575A5E;
+    --color-inv-charcoal:  #222823;
+}
