@@ -34,6 +34,7 @@
             color: var(--inv-midnight);
         }
     </style>
+    @stack('styles')
 </head>
 <body class="min-h-full flex flex-col bg-[#F4F7F5] text-[#08090A]">
 
@@ -43,7 +44,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Brand / Logo -->
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-6">
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-2 group">
                         <div class="w-9 h-9 rounded-lg bg-[#4E5340] flex items-center justify-center font-bold text-white tracking-wider border border-[#B7D1DA]/30 shadow-inner group-hover:bg-[#697268] transition">
                             IV
@@ -51,29 +52,63 @@
                         <span class="font-extrabold text-lg tracking-tight text-[#F4F7F5]">INVENIO</span>
                     </a>
 
-                    <!-- Tenant Context Indicator -->
-                    @if(auth()->user()->isSuperAdmin())
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#4E5340] text-[#E2E8DD] border border-[#B7D1DA]/20">
-                            🛡️ Super Admin
-                        </span>
-                    @elseif(auth()->user()->tenant)
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#697268]/60 text-[#B7D1DA] border border-[#697268]">
-                            🏢 {{ auth()->user()->tenant->name }}
-                        </span>
-                    @endif
+                    <!-- Navigation Links by Role -->
+                    <nav class="hidden md:flex items-center space-x-1 text-xs font-semibold">
+                        <a href="{{ route('dashboard') }}" 
+                           class="px-3 py-2 rounded-md transition {{ request()->routeIs('dashboard') ? 'bg-[#4E5340] text-[#F4F7F5]' : 'text-[#B7D1DA] hover:bg-[#697268]/50 hover:text-white' }}">
+                            Dashboard
+                        </a>
+
+                        @if(auth()->user()->isSuperAdmin())
+                            <a href="{{ route('superadmin.tenants.index') }}" 
+                               class="px-3 py-2 rounded-md transition {{ request()->routeIs('superadmin.tenants.*') ? 'bg-[#4E5340] text-[#F4F7F5]' : 'text-[#B7D1DA] hover:bg-[#697268]/50 hover:text-white' }}">
+                                Kelola Tenant
+                            </a>
+                        @elseif(auth()->user()->isAdmin())
+                            <!-- Master Data Links -->
+                            <div class="relative group">
+                                <button class="px-3 py-2 rounded-md flex items-center gap-1 text-[#B7D1DA] hover:bg-[#697268]/50 hover:text-white transition {{ request()->routeIs('admin.sites.*', 'admin.users.*', 'admin.categories.*', 'admin.types.*') ? 'bg-[#4E5340] text-[#F4F7F5]' : '' }}">
+                                    <span>Master Data</span>
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </button>
+                                <div class="absolute left-0 mt-1 w-48 bg-[#222823] border border-[#697268] rounded-lg shadow-lg py-1.5 hidden group-hover:block z-50">
+                                    <a href="{{ route('admin.sites.index') }}" class="block px-4 py-2 text-xs text-[#E2E8DD] hover:bg-[#4E5340] hover:text-white">🏢 Sites / Lokasi</a>
+                                    <a href="{{ route('admin.users.index') }}" class="block px-4 py-2 text-xs text-[#E2E8DD] hover:bg-[#4E5340] hover:text-white">👥 User & Karyawan</a>
+                                    <a href="{{ route('admin.categories.index') }}" class="block px-4 py-2 text-xs text-[#E2E8DD] hover:bg-[#4E5340] hover:text-white">📁 Kategori Barang</a>
+                                    <a href="{{ route('admin.types.index') }}" class="block px-4 py-2 text-xs text-[#E2E8DD] hover:bg-[#4E5340] hover:text-white">🏷️ Jenis & Spek Barang</a>
+                                </div>
+                            </div>
+
+                            <!-- Kelola Inventaris Links -->
+                            <a href="{{ route('admin.assets.index') }}" 
+                               class="px-3 py-2 rounded-md transition {{ request()->routeIs('admin.assets.*') ? 'bg-[#4E5340] text-[#F4F7F5]' : 'text-[#B7D1DA] hover:bg-[#697268]/50 hover:text-white' }}">
+                                📦 Data Inventaris
+                            </a>
+
+                            <a href="{{ route('admin.mutations.index') }}" 
+                               class="px-3 py-2 rounded-md transition {{ request()->routeIs('admin.mutations.*') ? 'bg-[#4E5340] text-[#F4F7F5]' : 'text-[#B7D1DA] hover:bg-[#697268]/50 hover:text-white' }}">
+                                🔄 Log Mutasi
+                            </a>
+                        @else
+                            <a href="{{ route('user.my-assets') }}" 
+                               class="px-3 py-2 rounded-md transition {{ request()->routeIs('user.my-assets') ? 'bg-[#4E5340] text-[#F4F7F5]' : 'text-[#B7D1DA] hover:bg-[#697268]/50 hover:text-white' }}">
+                                🎒 Barang Saya
+                            </a>
+                        @endif
+                    </nav>
                 </div>
 
                 <!-- Right Nav / User Profile & Logout -->
                 <div class="flex items-center gap-4">
                     <div class="text-right hidden sm:block">
-                        <div class="text-sm font-semibold text-[#F4F7F5]">{{ auth()->user()->name }}</div>
-                        <div class="text-xs text-[#95A3A4] flex items-center justify-end gap-1">
+                        <div class="text-xs font-semibold text-[#F4F7F5]">{{ auth()->user()->name }}</div>
+                        <div class="text-[11px] text-[#95A3A4] flex items-center justify-end gap-1">
                             @if(auth()->user()->isSuperAdmin())
-                                <span class="text-[#B7D1DA] font-medium">Super Administrator</span>
+                                <span class="text-[#B7D1DA] font-semibold">🛡️ Super Admin</span>
                             @elseif(auth()->user()->isAdmin())
-                                <span class="text-[#B7D1DA] font-medium">Tenant Admin</span>
+                                <span class="text-[#B7D1DA] font-semibold">🏢 {{ auth()->user()->tenant->name ?? 'Admin' }}</span>
                             @else
-                                <span class="text-[#A7A2A9] font-medium">Tenant User</span>
+                                <span class="text-[#A7A2A9]">👤 Staff ({{ auth()->user()->tenant->name ?? '' }})</span>
                             @endif
                         </div>
                     </div>
@@ -91,11 +126,56 @@
                 </div>
             </div>
         </div>
+
+        <!-- Mobile Nav Bar -->
+        <div class="md:hidden border-t border-[#697268]/40 px-4 py-2 flex flex-wrap gap-1 text-xs">
+            <a href="{{ route('dashboard') }}" class="px-2.5 py-1 rounded text-[#B7D1DA] hover:bg-[#4E5340]">Dashboard</a>
+            @if(auth()->user()->isSuperAdmin())
+                <a href="{{ route('superadmin.tenants.index') }}" class="px-2.5 py-1 rounded text-[#B7D1DA] hover:bg-[#4E5340]">Tenant</a>
+            @elseif(auth()->user()->isAdmin())
+                <a href="{{ route('admin.sites.index') }}" class="px-2.5 py-1 rounded text-[#B7D1DA] hover:bg-[#4E5340]">Sites</a>
+                <a href="{{ route('admin.users.index') }}" class="px-2.5 py-1 rounded text-[#B7D1DA] hover:bg-[#4E5340]">Users</a>
+                <a href="{{ route('admin.categories.index') }}" class="px-2.5 py-1 rounded text-[#B7D1DA] hover:bg-[#4E5340]">Kategori</a>
+                <a href="{{ route('admin.types.index') }}" class="px-2.5 py-1 rounded text-[#B7D1DA] hover:bg-[#4E5340]">Jenis</a>
+                <a href="{{ route('admin.assets.index') }}" class="px-2.5 py-1 rounded text-[#B7D1DA] hover:bg-[#4E5340]">Inventaris</a>
+                <a href="{{ route('admin.mutations.index') }}" class="px-2.5 py-1 rounded text-[#B7D1DA] hover:bg-[#4E5340]">Mutasi</a>
+            @else
+                <a href="{{ route('user.my-assets') }}" class="px-2.5 py-1 rounded text-[#B7D1DA] hover:bg-[#4E5340]">Barang Saya</a>
+            @endif
+        </div>
     </header>
     @endauth
 
+    <!-- Flash Notification Messages -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 w-full">
+        @if(session('success'))
+            <div class="p-3.5 mb-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-2">
+                    <span class="text-base">✅</span>
+                    <span>{{ session('success') }}</span>
+                </div>
+            </div>
+        @endif
+
+        @if(session('error') || $errors->any())
+            <div class="p-3.5 mb-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs font-semibold shadow-sm">
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="text-base">⚠️</span>
+                    <span>{{ session('error') ?? 'Terjadi kesalahan input data:' }}</span>
+                </div>
+                @if($errors->any())
+                    <ul class="list-disc list-inside space-y-0.5 ml-6 font-normal">
+                        @foreach($errors->all() as $err)
+                            <li>{{ $err }}</li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+        @endif
+    </div>
+
     <!-- Main Content Area -->
-    <main class="flex-1">
+    <main class="flex-1 pb-12">
         @yield('content')
     </main>
 
@@ -106,5 +186,6 @@
         </div>
     </footer>
 
+    @stack('scripts')
 </body>
 </html>

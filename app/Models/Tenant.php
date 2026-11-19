@@ -23,19 +23,51 @@ class Tenant extends Model
         'is_active' => 'boolean',
     ];
 
-    /**
-     * Users that belong to this tenant.
-     */
+    protected static function booted(): void
+    {
+        static::deleting(function (Tenant $tenant) {
+            // Cascading clean deletion: hapus semua user, site, kategori, jenis, aset, dan mutasi
+            $tenant->users()->each(fn($u) => $u->delete());
+            $tenant->assets()->each(fn($a) => $a->delete());
+            $tenant->types()->each(fn($t) => $t->delete());
+            $tenant->categories()->each(fn($c) => $c->delete());
+            $tenant->sites()->each(fn($s) => $s->delete());
+            $tenant->mutations()->delete();
+        });
+    }
+
     public function users()
     {
         return $this->hasMany(User::class);
     }
 
-    /**
-     * Get the admin users of this tenant.
-     */
     public function admins()
     {
         return $this->hasMany(User::class)->where('role', 'admin');
+    }
+
+    public function sites()
+    {
+        return $this->hasMany(Site::class);
+    }
+
+    public function categories()
+    {
+        return $this->hasMany(AssetCategory::class);
+    }
+
+    public function types()
+    {
+        return $this->hasMany(AssetType::class);
+    }
+
+    public function assets()
+    {
+        return $this->hasMany(Asset::class);
+    }
+
+    public function mutations()
+    {
+        return $this->hasMany(AssetMutation::class);
     }
 }

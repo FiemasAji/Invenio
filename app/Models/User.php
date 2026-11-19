@@ -21,13 +21,13 @@ class User extends Authenticatable
         'tenant_id',
         'role',
         'is_active',
+        'employee_id',
+        'phone',
+        'position',
+        'site_id',
+        'custom_code',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -42,6 +42,21 @@ class User extends Authenticatable
     public function tenant()
     {
         return $this->belongsTo(Tenant::class);
+    }
+
+    public function site()
+    {
+        return $this->belongsTo(Site::class);
+    }
+
+    public function assets()
+    {
+        return $this->hasMany(Asset::class);
+    }
+
+    public function mutations()
+    {
+        return $this->hasMany(AssetMutation::class, 'created_by');
     }
 
     // ─── Role Helpers ─────────────────────────────────────────────────
